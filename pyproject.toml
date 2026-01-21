@@ -1,0 +1,22 @@
+[project]
+name = "hyper-mirror"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.128.0",
+    "httpx>=0.28.1",
+    "pyyaml>=6.0.3",
+    "uvicorn>=0.40.0",
+]
+
+[project.scripts]
+hyper-mirror = "hyper_mirror:main"
+
+[[tool.uv.index]]
+url = "https://mirror-pypi.runflare.com/simple"
+
+[build-system]
+requires = ["uv_build>=0.9.21,<0.10.0"]
+build-backend = "uv_build"
