@@ -6,7 +6,7 @@ import os
 # Add src to path for development
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from hyper_mirror.main import create_app
+from mirava.main import create_app
 import uvicorn
 
 

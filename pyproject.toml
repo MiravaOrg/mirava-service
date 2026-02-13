@@ -1,5 +1,5 @@
 [project]
-name = "hyper-mirror"
+name = "mirava"
 version = "0.1.0"
 description = "Universal proxy for Docker registry and PyPI mirrors with automatic failover"
 readme = "README.md"
@@ -8,6 +8,8 @@ license = {text = "MIT"}
 authors = [
     {name = "Ali Tavallaie", email = "a.tavallaie@gmail.com"}
 ]
+maintainers = [
+    { name = "Mirava team" }]
 keywords = ["docker", "pypi", "mirror", "proxy", "registry", "cache"]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -29,12 +31,12 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/tavallaie/hyper-mirror"
-Documentation = "https://github.com/tavallaie/hyper-mirror#readme"
-Repository = "https://github.com/tavallaie/hyper-mirror.git"
-Issues = "https://github.com/tavallaie/hyper-mirror/issues"
+Homepage = "https://github.com/MiravaOrg/mirava-service"
+Documentation = "https://github.com/MiravaOrg/mirava-service#readme"
+Repository = "https://github.com/MiravaOrg/mirava-service.git"
+Issues = "https://github.com/MiravaOrg/mirava-service/issues"
 [project.scripts]
-hyper-mirror = "hyper_mirror.app:run"
+mirava = "mirava.app:run"
 
 [build-system]
 requires = ["uv_build>=0.9.21,<0.10.0"]
