@@ -1,4 +1,4 @@
- # Hyper Mirror
+ # mirava
 
  Universal proxy for Docker registry and PyPI mirrors with automatic failover.
 
@@ -13,8 +13,8 @@
  ## Installation
 
  ```bash
- git clone https://github.com/yourusername/hyper-mirror.git
- cd hyper-mirror
+ git clone https://github.com/yourusername/mirava.git
+ cd mirava
  uv sync
  ```
 
@@ -22,7 +22,7 @@
 
  ```bash
  # Run with default configuration
- uv run hyper-mirror
+ uv run mirava
 
  # Or run directly
  uv run python -m hyper_mirror.main
@@ -47,12 +47,12 @@
 
  ```bash
  # Use custom PyPI index
- PYPI_OFFICIAL_URL=https://pypi.company.internal/simple uv run hyper-mirror
+ PYPI_OFFICIAL_URL=https://pypi.company.internal/simple uv run mirava
 
  # Custom mirrors only
  PYPI_MIRRORS="https://mirror1.com/simple,https://mirror2.com/simple" \
  DOCKER_MIRRORS="https://docker-mirror1.com,https://docker-mirror2.com" \
- uv run hyper-mirror
+ uv run mirava
  ```
 
  ## Docker Setup
@@ -181,7 +181,7 @@
 
  ```bash
  # Run in development mode with auto-reload
- uv run --reload hyper-mirror
+ uv run --reload mirava
 
  # Or with Python directly
  cd src
@@ -193,7 +193,7 @@
  ```yaml
  version: '3.8'
  services:
-   hyper-mirror:
+   mirava:
      build: .
      ports:
        - "8080:8080"

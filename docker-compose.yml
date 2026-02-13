@@ -1,7 +1,7 @@
 services:
-  hyper-mirror:
+  mirava:
     build: .
-    container_name: hyper-mirror
+    container_name: mirava
     networks:
       - traefik
     labels:

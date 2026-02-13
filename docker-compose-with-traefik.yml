@@ -12,7 +12,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
-  hyper-mirror:
+  mirava:
     build: .
     labels:
       - "traefik.enable=true"
