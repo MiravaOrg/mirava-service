@@ -1,9 +1,25 @@
 [project]
 name = "hyper-mirror"
 version = "0.1.0"
-description = "Add your description here"
+description = "Universal proxy for Docker registry and PyPI mirrors with automatic failover"
 readme = "README.md"
 requires-python = ">=3.12"
+license = {text = "MIT"}
+authors = [
+    {name = "Ali Tavallaie", email = "a.tavallaie@gmail.com"}
+]
+keywords = ["docker", "pypi", "mirror", "proxy", "registry", "cache"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Internet :: Proxy Servers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Systems Administration",
+]
 dependencies = [
     "fastapi>=0.128.0",
     "httpx>=0.28.1",
@@ -12,6 +28,11 @@ dependencies = [
     "uvicorn>=0.40.0",
 ]
 
+[project.urls]
+Homepage = "https://github.com/tavallaie/hyper-mirror"
+Documentation = "https://github.com/tavallaie/hyper-mirror#readme"
+Repository = "https://github.com/tavallaie/hyper-mirror.git"
+Issues = "https://github.com/tavallaie/hyper-mirror/issues"
 [project.scripts]
 hyper-mirror = "hyper_mirror.app:run"
 
