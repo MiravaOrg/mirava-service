@@ -16,4 +16,4 @@ RUN uv pip install --system --no-cache .
 
 EXPOSE 8080
 
-CMD ["uvicorn", "hyper_mirror.main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "mirava.main:app", "--host", "0.0.0.0", "--port", "8080"]

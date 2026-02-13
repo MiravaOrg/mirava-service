@@ -25,7 +25,7 @@
  uv run mirava
 
  # Or run directly
- uv run python -m hyper_mirror.main
+ uv run python -m mirava.main
  ```
 
  Server starts on `http://localhost:8080`
@@ -125,7 +125,7 @@
  ## Project Structure
 
  ```
- src/hyper_mirror/
+ src/mirava/
  ├── __init__.py          # Package init
  ├── main.py              # FastAPI application
  ├── cli.py               # CLI entry point
@@ -138,7 +138,7 @@
 
  ## Adding New Mirror Types
 
- 1. Create new file `src/hyper_mirror/npm.py`:
+ 1. Create new file `src/mirava/npm.py`:
 
  ```python
  from fastapi import APIRouter
@@ -185,7 +185,7 @@
 
  # Or with Python directly
  cd src
- PYTHONPATH=. uvicorn hyper_mirror.main:create_app --factory --reload
+ PYTHONPATH=. uvicorn mirava.main:create_app --factory --reload
  ```
 
  ## Docker Compose
