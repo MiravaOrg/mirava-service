@@ -1,64 +1,110 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import StreamingResponse
 from contextlib import asynccontextmanager
 import httpx
 import logging
+from fastapi import FastAPI
 
-logging.basicConfig(level=logging.INFO)
+try:
+    from .mirrors import init_mirrors, registry
+    from . import docker, pypi
+except ImportError:
+    from .mirrors import init_mirrors, registry
 
-# Configuration: Mirrors prioritized by list order
-MIRRORS = [
-    {"name": "runflare", "url": "https://mirror-pypi.runflare.com/simple"},
-    {"name": "pypi", "url": "https://pypi.org/simple"},
-]
+
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.client = httpx.AsyncClient(timeout=5.0)
+    """Manage shared httpx client"""
+    app.state.client = httpx.AsyncClient(
+        timeout=httpx.Timeout(60.0, connect=10.0),
+        follow_redirects=True,
+        http2=False,
+    )
+    logger.info("HTTP client initialized")
+    init_mirrors()
     yield
     await app.state.client.aclose()
+    logger.info("HTTP client closed")
 
-app = FastAPI(lifespan=lifespan)
 
-@app.get("/simple/{package_name}/")
-async def route_manager(package_name: str):
-    client: httpx.AsyncClient = app.state.client
-
-    for mirror in MIRRORS:
-        target_url = f"{mirror['url']}/{package_name}/"
-        logging.info(f"Trying mirror: {mirror['name']} → {target_url}")
-
-        try:
-            response = await client.get(
-                target_url,
-                follow_redirects=True
-            )
-
-            if response.status_code == 200:
-                logging.info(
-                    f"Serving '{package_name}' from mirror: {mirror['name']}"
-                )
-
-                return StreamingResponse(
-                    response.aiter_bytes(),
-                    status_code=200,
-                    media_type=response.headers.get("content-type", "text/html"),
-                    headers={
-                        "X-Served-By": mirror["name"]
-                    }
-                )
-
-        except (httpx.ConnectError, httpx.TimeoutException) as exc:
-            logging.warning(
-                f"Mirror failed: {mirror['name']} ({exc})"
-            )
-            continue
-
-    raise HTTPException(
-        status_code=404,
-        detail=f"Package '{package_name}' could not be found on any mirrors."
+def create_app() -> FastAPI:
+    """Application factory"""
+    app = FastAPI(
+        title="Universal Mirror Proxy",
+        description="FastAPI-based proxy for Docker registry, PyPI, and more",
+        version="2.0.0",
+        docs_url="/docs",
+        redoc_url="/redoc",
+        lifespan=lifespan,
     )
 
+    app.include_router(docker.router)
+    app.include_router(pypi.router)
+
+    @app.get("/")
+    async def root():
+        managers = registry.list_managers()
+        return {
+            "service": "Universal Mirror Proxy",
+            "version": "2.0.0",
+            "mirror_types": list(managers.keys()),
+            "total_mirrors": sum(len(m.mirrors) for m in managers.values()),
+            "endpoints": {
+                "docker_v2": "/v2/",
+                "pypi_simple": "/simple/{package}/",
+                "docs": "/docs",
+                "health": "/health",
+            },
+        }
+
+    @app.get("/health")
+    async def health_check():
+        import time
+
+        managers = registry.list_managers()
+        result = {"timestamp": time.time()}
+
+        for name, manager in managers.items():
+            result[name] = {
+                "total": len(manager.mirrors),
+                "healthy": len(
+                    [m for m in manager.mirrors if m.health.value == "healthy"]
+                ),
+                "mirrors": [
+                    {
+                        "name": m.name,
+                        "url": m.url,
+                        "health": m.health.value,
+                        "failures": m.failure_count,
+                    }
+                    for m in manager.mirrors
+                ],
+            }
+        return result
+
+    @app.post("/mirrors/{mirror_type}")
+    async def add_mirror(mirror_type: str, url: str, name: str, priority: int = 50):
+        try:
+            manager = registry.get(mirror_type)
+            manager.add_mirror(url, name, priority)
+            return {"status": "added", "type": mirror_type, "name": name, "url": url}
+        except KeyError:
+            from fastapi import HTTPException
+
+            raise HTTPException(
+                status_code=404, detail=f"Unknown mirror type: {mirror_type}"
+            )
+
+    return app
+
+
+# For direct execution
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8080)
+
+    app = create_app()
+    uvicorn.run(app, host="0.0.0.0", port=8080, log_level="info")

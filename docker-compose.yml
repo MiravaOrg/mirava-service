@@ -1,0 +1,17 @@
+services:
+  hyper-mirror:
+    build: .
+    container_name: hyper-mirror
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.routers.pypi.rule=Host(`dev.local`)"
+      - "traefik.http.routers.pypi.entrypoints=web"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.services.pypi.loadbalancer.server.port=8080"
+
+networks:
+  traefik:
+    external: true
